@@ -12,7 +12,7 @@ void TopicCommand::execute(Client *client, std::vector<std::string> args)
 		client->msgReply(client->getNickname() + " :You're not on a channel");
 		return ;
 	}
-	std::string old_topic = client->getChannel()->getTopic();
+	std::string old_topic = channel->getTopic();
 	if (args.empty() || (args[0] == channel->getName() && args.size() == 1)) //dumb fixes for hexchat
 	{
 		client->msgReply("Topic for " + client->getChannel()->getName() + " is :" + client->getChannel()->getTopic());
