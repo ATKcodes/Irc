@@ -6,26 +6,24 @@ PartCommand::~PartCommand() {}
 
 void	PartCommand::execute(Client *client, std::vector<std::string> args)
 {
-	if (args.empty())
-	{
-		client->msgReply(ERR_NEEDMOREPARAMS(client->getNickname(), "PART"));
-		return;
-	}
-
-	std::string	name = args.at(0);
-
-	Channel	*channel = this->server->getChannel(name);
+	Channel *channel = client->getChannel();
 	if (channel == nullp)
 	{
-		client->msgReply(ERR_NOSUCHCHANNEL(client->getNickname(), name));
+		client->msgReply(ERR_NOTONCHANNEL(client->getNickname(), ""));
 		return;
 	}
-
-	if (client->getChannel() == nullp || client->getChannel()->getName().compare(name))
+	std::string hexfix = "#" + channel->getName();
+	std::cout <<"hexfix : " << hexfix << std::endl;
+	if (args.size() != 0 && args.at(0) != hexfix)
 	{
-		client->msgReply(ERR_NOTONCHANNEL(client->getNickname(), name));
-		return;
+		client->leave();
 	}
-
-	client->leave();
+	else
+	{
+		std::string	name = args.at(0);
+		std::string	reason = args.at(1);
+		std::string msg = "PART " + name + " " + reason;
+		channel->broadcast(msg);
+		client->leave();
+	}
 }

@@ -6,6 +6,10 @@ ModeCommand::~ModeCommand() {}
 void ModeCommand::execute(Client *client, std::vector<std::string> args)
 {
 	Channel	*channel = client->getChannel();
+	// for (size_t i = 0; i < args.size(); i++)
+	// {
+	// 	std::cout << "args[" << i << "] = " << args[i] << std::endl;
+	// }
 	if (channel == nullp)
 	{
 		client->msgReply(client->getNickname() + " :You're not on a channel");
@@ -21,15 +25,29 @@ void ModeCommand::execute(Client *client, std::vector<std::string> args)
 		client->msgReply(ERR_NOTADMIN(client->getNickname()));
 		return ;
 	}
-	std::string mode = args[0];
+	int i;
+	if (args[0] == channel->getName()) //dumb shit to fix hexchat
+	{
+		i = 1;
+	}
+	else
+	{
+		i = 0;
+	}
+	if (args.size() <= 1)
+	{
+		return ;
+	}
+	std::string mode = args[i];
 	if (mode == "+o" || mode == "-o")
 	{
-		if (args.size() < 2)
+		if (args.size() < (2 + (unsigned int)i))
 		{
 			client->msgReply("MODE " + channel->getName() + " " + channel->getMode());
 			return ;
 		}
-		std::string nickname = args[1];
+		i++;
+		std::string nickname = args[i];
 		Client *target = this->server->find_client(nickname);
 		if (target == nullp)
 		{
@@ -59,16 +77,16 @@ void ModeCommand::execute(Client *client, std::vector<std::string> args)
 	}
 	else if (mode == "+l" || mode == "-l")
 	{
-		if (args.size() < 2)
-		{
-			client->msgReply("MODE " + channel->getName() + " " + channel->getMode());
-			return ;
-		}
-		int limit;
-		std::istringstream iss(args[1]);
-		iss >> limit;
 		if (mode == "+l")
 		{
+			if (args.size() < (2 + (unsigned int)i))
+			{
+				client->msgReply("MODE " + channel->getName() + " " + channel->getMode());
+				return ;
+			}
+			int limit;
+			std::istringstream iss(args[(1 + i)]);
+			iss >> limit;
 			channel->setLimit(limit);
 			std::stringstream ss;
 			ss << limit;
@@ -82,14 +100,14 @@ void ModeCommand::execute(Client *client, std::vector<std::string> args)
 	}
 	else if (mode == "+k" || mode == "-k")
 	{
-		if (args.size() < 2)
-		{
-			client->msgReply("MODE " + channel->getName() + " " + channel->getMode());
-			return ;
-		}
-		std::string key = args[1];
 		if (mode == "+k")
 		{
+			if (args.size() < (2 + (unsigned int)i))
+			{
+				client->msgReply("MODE " + channel->getName() + " " + channel->getMode());
+				return ;
+			}
+			std::string key = args[(1 + i)];
 			channel->setKey(key);
 			client->msgChannel(channel, "MODE " + channel->getName() + " +k " + key);
 		}
