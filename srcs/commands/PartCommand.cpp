@@ -13,7 +13,6 @@ void	PartCommand::execute(Client *client, std::vector<std::string> args)
 		return;
 	}
 	std::string hexfix = "#" + channel->getName();
-	std::cout <<"hexfix : " << hexfix << std::endl;
 	if (args.size() != 0 && args.at(0) != hexfix)
 	{
 		client->leave();

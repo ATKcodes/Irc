@@ -12,15 +12,10 @@ void TopicCommand::execute(Client *client, std::vector<std::string> args)
 		client->msgReply(client->getNickname() + " :You're not on a channel");
 		return ;
 	}
-	std::string old_topic = client->getChannel()->getTopic();
-	if (args.empty())
+	std::string old_topic = channel->getTopic();
+	if (args.empty() || (args[0] == channel->getName() && args.size() == 1)) //dumb fixes for hexchat
 	{
-		if (old_topic.empty())
-		{
-			client->msgReply(RPL_NOTOPIC(client->getNickname(), client->getChannel()->getName()));
-			return ;
-		}
-		client->msgReply("Topic for " + client->getChannel()->getName() + " is :" + client->getChannel()->getTopic());
+		client->msgReply("Topic for " + channel->getName() + " is : " + channel->getTopic());
 		return ;
 	}
 
@@ -35,6 +30,8 @@ void TopicCommand::execute(Client *client, std::vector<std::string> args)
 	}
 	std::string topic;
 	std::vector<std::string>::iterator it = args.begin();
+	if (*it == channel->getName())
+		it++;
 	while (it != args.end())
 	{
 		topic += *it;
@@ -46,5 +43,5 @@ void TopicCommand::execute(Client *client, std::vector<std::string> args)
 	std::string	channelName = channel->getName();
 
 	channel->setTopic(topic);
-	client->msgChannel(channel, "TOPIC " + channelName + " :" + topic);
+	client->msgChannel(channel, "TOPIC " + channelName + " " + topic);
 }

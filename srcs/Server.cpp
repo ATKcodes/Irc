@@ -48,7 +48,6 @@ void	Server::start()
 
 	while (this->running)
 	{
-		// waiting for events
 		if (poll(poll_fds.begin().base(), poll_fds.size(), -1) < 0)
 			throw std::runtime_error("Error while polling");
 		// event handling
@@ -160,8 +159,7 @@ int	Server::handle_message(int fd)
 	std::string msg = this->recive(fd);
 	if (DEBUG)
 		console_log(msg);
-	// if disconnected
-	if (msg[0] == 0)
+	if (msg[0] == 0 || msg[0] == '\n' || msg[0] == '\r' || msg[0] == '\0' || msg.empty())
 	{
 		this->handle_disconnection(fd);
 		return (1);
