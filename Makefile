@@ -66,17 +66,12 @@ $(OBJ_SUB_DIRS):
 clean:
 	@ $(RM) $(OBJ_DIR)
 	@ echo "$(YELLOW)[+] $(OBJ_DIR) cleaned$(END)"
-	@ make clean -C bot
 
 fclean: clean
 	@ $(RM) $(NAME)
 	@ echo "$(YELLOW)[+] $(NAME) fcleaned$(END)"
-	@ make fclean -C bot
 
 re: fclean all
-
-bonus: all
-	@ make -C bot
 
 
 

@@ -51,15 +51,6 @@ class InviteCommand : public Command
 		void execute(Client *client, std::vector<std::string> args);
 };
 
-class NoticeCommand : public Command
-{
-	public:
-		NoticeCommand(Server *server, int auth = 0);
-		~NoticeCommand();
-
-		void execute(Client *client, std::vector<std::string> args);
-};
-
 class PrivMsgCommand : public Command
 {
 	public:
@@ -133,22 +124,5 @@ class KickCommand : public Command
 		void execute(Client *client, std::vector<std::string> args);
 };
 
-class PingCommand : public Command
-{
-	public:
-		PingCommand(Server *server, int auth = 0);
-		~PingCommand();
-
-		void execute(Client *client, std::vector<std::string> args);
-};
-
-class PongCommand : public Command
-{
-	public:
-		PongCommand(Server *server, int auth = 0);
-		~PongCommand();
-
-		void execute(Client *client, std::vector<std::string> args);
-};
 
 #endif

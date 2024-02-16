@@ -6,10 +6,6 @@ ModeCommand::~ModeCommand() {}
 void ModeCommand::execute(Client *client, std::vector<std::string> args)
 {
 	Channel	*channel = client->getChannel();
-	// for (size_t i = 0; i < args.size(); i++)
-	// {
-	// 	std::cout << "args[" << i << "] = " << args[i] << std::endl;
-	// }
 	if (channel == nullp)
 	{
 		client->msgReply(client->getNickname() + " :You're not on a channel");

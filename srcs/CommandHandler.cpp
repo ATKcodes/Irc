@@ -9,12 +9,9 @@ CommandHandler::CommandHandler(Server *server)
 	this->commands["USER"] = new UserCommand(server, 0);
 	this->commands["QUIT"] = new QuitCommand(server, 0);
 	
-	this->commands["PING"] = new PingCommand(server, 1);
-	this->commands["PONG"] = new PongCommand(server, 1);
 	this->commands["JOIN"] = new JoinCommand(server, 1);
 	this->commands["PART"] = new PartCommand(server, 1);
 	this->commands["PRIVMSG"] = new PrivMsgCommand(server, 1);
-	this->commands["NOTICE"] = new NoticeCommand(server, 1);
 	this->commands["TOPIC"] = new TopicCommand(server, 1);
 
 	this->commands["MODE"] = new ModeCommand(server, 2);
