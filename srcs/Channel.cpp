@@ -7,7 +7,7 @@ Channel::Channel(std::string const &name, std::string const &password)
 	this->limit = -1;
 	this->topic = "Welcome to " + name;
 	this->inviteOnly = false;
-	this->topicOnly = false;
+	this->topicOnly = true;
 }
 
 Channel::~Channel() {}

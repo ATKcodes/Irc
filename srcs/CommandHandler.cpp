@@ -69,6 +69,7 @@ int	CommandHandler::handle_command(Client *client, std::string cmd)
 		}
 		catch (const std::out_of_range &err)
 		{
+
 			client->msgReply(ERR_UNKNOWNCOMMAND(client->getNickname(), name));
 		}
 

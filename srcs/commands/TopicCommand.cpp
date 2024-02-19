@@ -21,7 +21,7 @@ void TopicCommand::execute(Client *client, std::vector<std::string> args)
 
 	if (client->getStatus() == 1 && !channel->isTopicOnly()) //bypassing the else if
 	{
-		channel->setTopicOnly(false);
+		channel->setTopicOnly(true);
 	}
 	else if (client->getStatus() != 2)
 	{
