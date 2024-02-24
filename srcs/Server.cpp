@@ -28,12 +28,13 @@ Server::~Server()
 	// clean memory
 	delete this->handler;
 	close(this->sock);
-	console_log("Main Socket Closed");
+	print_time("Main Socket Closed");
 }
 
 void	handle_sigint(int sig)
 {
 	(void)sig;
+	std::cout << "\nServer shutting down\n";
 	throw ServerQuitException();
 }
 
@@ -42,10 +43,8 @@ void	Server::start()
 	pollfd	server_fd = {this->sock, POLLIN, 0};
 	poll_fds.push_back(server_fd);
 
-	if (!MAC_OS)
-		signal(SIGINT, handle_sigint);
-	console_log("Server waiting for connections");
-
+	signal(SIGINT, handle_sigint);
+	print_time("Server waiting for connections");
 	while (this->running)
 	{
 		if (poll(poll_fds.begin().base(), poll_fds.size(), -1) < 0)
@@ -128,7 +127,7 @@ void	Server::handle_connection()
 	Client *new_client = new Client(fd, ip_addr, ntohs(addr.sin_port));
 	this->clients.insert(std::make_pair(fd, new_client));
 	// log new connection
-	console_log(new_client->log("has connected"));
+	print_time(new_client->log("has connected"));
 }
 
 std::string	Server::recive(int fd)
@@ -158,7 +157,7 @@ int	Server::handle_message(int fd)
 {
 	std::string msg = this->recive(fd);
 	if (DEBUG)
-		console_log(msg);
+		print_time(msg);
 	if (msg[0] == 0 || msg[0] == '\n' || msg[0] == '\r' || msg[0] == '\0' || msg.empty())
 	{
 		this->handle_disconnection(fd);
@@ -193,7 +192,7 @@ void	Server::handle_disconnection(int fd)
 			break ;
 		}
 		// message of disconnection
-		console_log(client->log("has disconnected"));
+		print_time(client->log("has disconnected"));
 		delete client;
 	}
 	catch (std::out_of_range const &err) {}

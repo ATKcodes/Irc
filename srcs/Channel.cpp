@@ -83,7 +83,7 @@ void	Channel::removeClient(Client *client)
 		{
 			this->clients.at(0)->setStatus(2);
 			msg.append(this->clients.at(0)->getNickname()).append(" is now the admin of ").append(this->name);
-			console_log(msg);
+			print_time(msg);
 		}
 	}
 }
@@ -96,7 +96,7 @@ void	Channel::kick(Client *client, Client *target, std::string const &reason)
 	this->removeClient(target);
 
 	tmp = client->getNickname() + " kicked " + target->getNickname() + " form channel " + this->name;
-	console_log(tmp);
+	print_time(tmp);
 }
 
 void	Channel::invite(Client *client, Client *target)

@@ -34,7 +34,7 @@ std::string	Client::log(std::string const &log)
 void	Client::reply(std::string const &msg) const
 {
 	if (DEBUG)
-		console_log(msg);
+		print_time(msg);
 	std::string	tmp = msg + "\r\n";
 	if (send(this->fd, tmp.c_str(), tmp.length(), 0) < 0)
 		throw std::runtime_error("Error while sending");
@@ -43,7 +43,7 @@ void	Client::reply(std::string const &msg) const
 void	Client::msgReply(std::string const &msg)
 {
 	if (DEBUG)
-		console_log(msg);
+		print_time(msg);
 	this->reply(":" + this->getPrefix() + " " + msg);
 }
 
@@ -52,7 +52,7 @@ void	Client::welcome()
 	if (!this->status || this->username.empty() || this->realname.empty() || this->nickname.empty())
 		return ;
 	this->msgReply(RPL_WELCOME(this->nickname));
-	console_log(this->log("is known as " + this->nickname));
+	print_time(this->log("is known as " + this->nickname));
 }
 
 void	Client::join(Channel *channel)
@@ -70,7 +70,7 @@ void	Client::join(Channel *channel)
 	this->msgReply(RPL_ENDOFNAMES(this->nickname, channel->getName()));
 	
 	channel->broadcast(RPL_JOIN(this->getPrefix(), channel->getName()));
-	console_log(this->nickname + " has joined channel " + channel->getName());
+	print_time(this->nickname + " has joined channel " + channel->getName());
 }
 
 void	Client::leave()
@@ -78,7 +78,7 @@ void	Client::leave()
 	if (this->channel == nullp)
 		return ;
 	this->channel->broadcast(RPL_PART(this->getPrefix(), this->channel->getName()));
-	console_log(this->nickname + " has left channel " + channel->getName());
+	print_time(this->nickname + " has left channel " + channel->getName());
 	this->channel->removeClient((this));
 }
 

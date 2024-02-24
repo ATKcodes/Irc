@@ -16,7 +16,6 @@
 
 class Server;
 
-#include "utils.hpp"
 #include "Client.hpp"
 #include "CommandHandler.hpp"
 #include "Channel.hpp"
