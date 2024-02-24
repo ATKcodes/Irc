@@ -51,8 +51,7 @@
 #define MAC_OS 0
 #define DEBUG 0
 
-
-void print_time(const std::string& message);
+void print_time(const std::string& msg);
 
 const class nullptr_t
 {

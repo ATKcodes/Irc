@@ -5,9 +5,9 @@
 
 class Channel;
 
+#include "utils.hpp"
 #include "Server.hpp"
 #include "Client.hpp"
-#include "utils.hpp"
 
 class Channel
 {

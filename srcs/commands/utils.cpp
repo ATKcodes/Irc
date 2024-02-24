@@ -1,7 +1,7 @@
 #include "utils.hpp"
 #include <iostream>
 
-void	print_time(std::string const &msg)
+void print_time(const std::string& msg)
 {
 	time_t		raw;
 	std::string      t;

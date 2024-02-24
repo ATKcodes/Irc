@@ -50,9 +50,9 @@ class Server
 
 		void					start();
 		int						create_socket();
-		void					handle_connection();
-		std::string				recive(int fd);
-		int						handle_message(int fd);
+		void					add_client();
+		std::string				receive(int fd);
+		int						handle_input(int fd);
 		void					handle_disconnection(int fd);
 		Channel					*createChannel(std::string const &name, std::string const &password);
 		Channel					*getChannel(std::string const &name);

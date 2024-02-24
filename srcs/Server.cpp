@@ -60,10 +60,10 @@ void	Server::start()
 			{
 				if (it->fd == this->sock)
 				{
-					this->handle_connection();
+					this->add_client();
 					break ;
 				}
-				if (this->handle_message(it->fd))
+				if (this->handle_input(it->fd))
 					break ;
 			}
 			// on disconnect
@@ -104,7 +104,7 @@ int	Server::create_socket()
 	return (sockfd);
 }
 
-void	Server::handle_connection()
+void	Server::add_client()
 {
 	int			fd;
 	sockaddr_in	addr = {};
@@ -130,47 +130,50 @@ void	Server::handle_connection()
 	print_time(new_client->log("has connected"));
 }
 
-std::string	Server::recive(int fd)
+std::string Server::receive(int fd)
 {
-	std::string	msg;
-	char		buffer[100];
+	std::string msg;
+	char buffer[100];
 
-	bzero(buffer, 100);
-	// recive until new line
-	while (!std::strstr(buffer, "\n"))
+	memset(buffer, 0, sizeof(buffer));
+	// receive until newline
+	while (msg.find('\n') == std::string::npos)
 	{
-		bzero(buffer, 100);
-		if (recv(fd, buffer, 100, 0) < 0)
+		memset(buffer, 0, sizeof(buffer));
+		int bytesReceived = recv(fd, buffer, sizeof(buffer) - 1, 0);
+		if (bytesReceived < 0)
 		{
 			if (errno != EWOULDBLOCK)
-				throw std::runtime_error("Error while reciving from client");
+				throw std::runtime_error("Error while receiving from client");
 		}
-		// clear buffer means exit (UNIX)
-		if (!buffer[0])
-			return ("");
-		msg.append(buffer);
+		// empty buffer means exit (UNIX)
+		if (bytesReceived == 0)
+			return "";
+		msg.append(buffer, bytesReceived);
 	}
-	return (msg);
+	return msg;
 }
 
-int	Server::handle_message(int fd)
+
+int Server::handle_input(int fd)
 {
-	std::string msg = this->recive(fd);
+	std::string msg = this->receive(fd);
 	if (DEBUG)
 		print_time(msg);
-	if (msg[0] == 0 || msg[0] == '\n' || msg[0] == '\r' || msg[0] == '\0' || msg.empty())
+	
+	if (msg.empty() || msg == "\n")
 	{
 		this->handle_disconnection(fd);
-		return (1);
+		return 1;
 	}
-	// command handling
-	Client	*client = this->clients.at(fd);
+	
+	Client* client = this->clients.at(fd);
 	if (this->handler->handle_command(client, msg))
 	{
 		this->handle_disconnection(client->getFd());
-		return (1);
+		return 1;
 	}
-	return (0);
+	return 0;
 }
 
 void	Server::handle_disconnection(int fd)
