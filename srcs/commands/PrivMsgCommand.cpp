@@ -8,7 +8,7 @@ void	PrivMsgCommand::execute(Client *client, std::vector<std::string> args)
 {
 	if (args.size() < 2 || args.at(0).empty() || args.at(1).empty())
 	{
-		client->msgReply(ERR_NEEDMOREPARAMS(client->getNickname(), "PRIVMSG"));
+		client->msgReply(ERRORPARAMS(client->getNickname(), "PRIVMSG"));
 		return;
 	}
 
@@ -37,7 +37,7 @@ void	PrivMsgCommand::execute(Client *client, std::vector<std::string> args)
 	Client	*dst = this->server->getClient(target);
 	if (dst == nullp)
 	{
-		client->msgReply(ERR_NOSUCHNICK(client->getNickname(), target));
+		client->msgReply(ERRORNICKNOTFOUND(client->getNickname(), target));
 		return;
 	}
 

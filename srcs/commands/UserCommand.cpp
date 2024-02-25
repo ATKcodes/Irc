@@ -8,7 +8,7 @@ void UserCommand::execute(Client *client, std::vector<std::string> args)
 {
 	if (args.size() < 4)
 	{
-		client->msgReply(ERR_NEEDMOREPARAMS(client->getNickname(), "USER"));
+		client->msgReply(ERRORPARAMS(client->getNickname(), "USER"));
 		return;
 	}
 	client->setUsername(args.at(0));

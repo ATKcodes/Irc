@@ -8,7 +8,7 @@ void	KickCommand::execute(Client *client, std::vector<std::string> args)
 {
 	if ((int)args.size() < 2)
 	{
-		client->msgReply(ERR_NEEDMOREPARAMS(client->getNickname(), "KICK"));
+		client->msgReply(ERRORPARAMS(client->getNickname(), "KICK"));
 		return ;
 	}
 
@@ -26,20 +26,20 @@ void	KickCommand::execute(Client *client, std::vector<std::string> args)
 	Channel	*channel = client->getChannel();
 	if (channel == nullp || channel->getName() != name)
 	{
-		client->msgReply(ERR_NOTONCHANNEL(client->getNickname(), name));
+		client->msgReply(ERRORWRONGCHANNEL(client->getNickname(), name));
 		return ;
 	}
 
 	Client	*dst = this->server->getClient(target);
 	if (dst == nullp)
 	{
-		client->msgReply(ERR_NOSUCHNICK(client->getNickname(), target));
+		client->msgReply(ERRORNICKNOTFOUND(client->getNickname(), target));
 		return;
 	}
 
 	if (dst->getChannel() == nullp || dst->getChannel() != channel)
 	{
-		client->msgReply(ERR_USERNOTINCHANNEL(client->getNickname(), dst->getNickname(), name));
+		client->msgReply(ERRORKICKNOTFOUND(client->getNickname(), dst->getNickname(), name));
 		return;
 	}
 

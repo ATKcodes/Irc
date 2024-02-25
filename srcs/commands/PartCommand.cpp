@@ -9,7 +9,7 @@ void	PartCommand::execute(Client *client, std::vector<std::string> args)
 	Channel *channel = client->getChannel();
 	if (channel == nullp)
 	{
-		client->msgReply(ERR_NOTONCHANNEL(client->getNickname(), ""));
+		client->msgReply(ERRORWRONGCHANNEL(client->getNickname(), ""));
 		return;
 	}
 	std::string hexfix = "#" + channel->getName();

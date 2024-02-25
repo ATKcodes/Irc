@@ -25,7 +25,7 @@ void TopicCommand::execute(Client *client, std::vector<std::string> args)
 	}
 	else if (client->getStatus() != 2)
 	{
-		client->msgReply(ERR_NOTADMIN(client->getNickname()));
+		client->msgReply(ERRORNOTADMIN(client->getNickname(), channel->getName()));
 		return ;
 	}
 	std::string topic;

@@ -8,7 +8,7 @@ void	JoinCommand::execute(Client *client, std::vector<std::string> args)
 {
 	if (args.empty())
 	{
-		client->msgReply(ERR_NEEDMOREPARAMS(client->getNickname(), "PASS"));
+		client->msgReply(ERRORPARAMS(client->getNickname(), "PASS"));
 		return ;
 	}
 	std::string	name = args.at(0);
@@ -19,7 +19,7 @@ void	JoinCommand::execute(Client *client, std::vector<std::string> args)
 	Channel	*channel = client->getChannel();
 	if (channel != nullp)
 	{
-		client->msgReply(ERR_TOOMANYCHANNELS(client->getNickname(), name));
+		client->msgReply(ERRORTOOMANYCHANNELS(client->getNickname(), name));
 		return ;
 	}
 
@@ -29,17 +29,17 @@ void	JoinCommand::execute(Client *client, std::vector<std::string> args)
 
 	if (password.compare(channel->getPassword()))
 	{
-		client->msgReply(ERR_BADCHANNELKEY(client->getNickname(), name));
+		client->msgReply(ERRORWRONGPASSCHANNEL(client->getNickname(), name));
 		return ;
 	}
 	if(channel->getLimit() != -1 && channel->getLimit() <= channel->getMembers())
 	{
-		client->msgReply(ERR_CHANNELISFULL(client->getNickname(), name));
+		client->msgReply(EERRORFULLCHANNEL(client->getNickname(), name));
 		return ;
 	}
 	if(channel->isInviteOnly())
 	{
-		client->msgReply(ERR_INVITEONLYCHAN(client->getNickname(), name));
+		client->msgReply(ERRORINVITEONLY(client->getNickname(), name));
 		return ;
 	}
 	client->join(channel);

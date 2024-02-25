@@ -37,16 +37,13 @@ int	CommandHandler::handle_command(Client *client, std::string cmd)
 	while (std::getline(ss_cmd, parsed))
 	{
 		std::string	msg;
-		// parse lines
 		length = parsed.length();
 		if (parsed[parsed.length() - 1] == '\n')
 			length -= 1; 
 		parsed = parsed.substr(0, length);
-		// parse command
 		name = parsed.substr(0, parsed.find(' '));
 		try
 		{
-			// get the command
 			Command						*command = this->commands.at(name);
 			std::vector<std::string>	args;
 			std::stringstream			ss_args(parsed.substr(name.length(), parsed.length()));
@@ -56,9 +53,9 @@ int	CommandHandler::handle_command(Client *client, std::string cmd)
 			if (client->getStatus() < command->getAuth()) // auth check
 			{
 				if (!client->getStatus())
-					client->msgReply(ERR_NOTREGISTERED(client->getNickname()));
+					client->msgReply(ERRORNOTREGISTERED(client->getNickname()));
 				else
-					client->msgReply(ERR_CHANOPRIVSNEEDED(client->getNickname(), client->getChannel()->getName()));
+					client->msgReply(ERRORNOTADMIN(client->getNickname(), client->getChannel()->getName()));
 				return (0);
 			}
 			// get the args
@@ -70,7 +67,7 @@ int	CommandHandler::handle_command(Client *client, std::string cmd)
 		catch (const std::out_of_range &err)
 		{
 
-			client->msgReply(ERR_UNKNOWNCOMMAND(client->getNickname(), name));
+			client->msgReply(ERRORCOMMAND(client->getNickname(), name));
 		}
 
 		if (!name.compare("QUIT"))

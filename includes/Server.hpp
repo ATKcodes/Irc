@@ -32,33 +32,32 @@ class ServerQuitException: public std::exception
 class Server
 {
 	private:
-		std::string				host;
 		std::string				port;
 		std::string				password;
-		int						sock;
-		int						running;
-		std::vector<pollfd>		poll_fds;
 		std::map<int, Client *>	clients;
-		std::vector<Channel *>	channels;
+		int						sock;
+		int						on;
+		std::vector<pollfd>		poll_fds;
 		CommandHandler			*handler;
+		std::vector<Channel *>	channels;
 
 	public:
 		Server(std::string const &port, std::string const &password);
 		~Server();
 
-		std::string				getPassword() { return (this->password); }
 
-		void					start();
-		int						create_socket();
+		std::string				getPassword() { return (this->password); }
 		void					add_client();
-		std::string				receive(int fd);
+		int						create_socket();
 		int						handle_input(int fd);
-		void					handle_disconnection(int fd);
+		std::string				receive(int fd);
+		void					start();
 		Channel					*createChannel(std::string const &name, std::string const &password);
 		Channel					*getChannel(std::string const &name);
-		std::vector<Channel *>	getChannels() { return (this->channels); }
+		void					quit_server(int fd);
 		Client					*getClient(std::string const &name);
-		Client					*find_client(std::string const &name);
+		Client					*search_client(std::string const &name);
+		std::vector<Channel *>	getChannels() { return (this->channels); }
 };
 
 #endif

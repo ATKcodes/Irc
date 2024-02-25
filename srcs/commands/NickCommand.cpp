@@ -8,7 +8,7 @@ void NickCommand::execute(Client *client, std::vector<std::string> args)
 {
 	if (args.empty() || args.at(0).empty())
 	{
-		client->msgReply(ERR_NONICKNAMEGIVEN(client->getNickname()));
+		client->msgReply(ERRORBLANKNICK(client->getNickname()));
 		return;
 	}
 
@@ -16,7 +16,7 @@ void NickCommand::execute(Client *client, std::vector<std::string> args)
 
 	if (this->server->getClient(nickname))
 	{
-		client->msgReply(ERR_NICKNAMEINUSE(client->getNickname()));
+		client->msgReply(ERRORDOUBLENICK(client->getNickname()));
 		return;
 	}
 	client->setNickname(nickname);

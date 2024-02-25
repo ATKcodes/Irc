@@ -8,7 +8,7 @@ void InviteCommand::execute(Client *client, std::vector<std::string> args)
 {
 	if ((int)args.size() < 2)
 	{
-		client->msgReply(ERR_NEEDMOREPARAMS(client->getNickname(), "INVITE"));
+		client->msgReply(ERRORPARAMS(client->getNickname(), "INVITE"));
 		return ;
 	}
 
@@ -18,28 +18,28 @@ void InviteCommand::execute(Client *client, std::vector<std::string> args)
 	Client	*dst = this->server->getClient(nickname);
 	if (dst == nullp)
 	{
-		client->msgReply(ERR_NOSUCHNICK(client->getNickname(), nickname));
+		client->msgReply(ERRORNICKNOTFOUND(client->getNickname(), nickname));
 		return ;
 	}
 	Channel	*channel = this->server->getChannel(channelName);
 	if (channel == nullp)
 	{
-		client->msgReply(ERR_NOSUCHCHANNEL(client->getNickname(), channelName));
+		client->msgReply(ERRORCHANNELNOTFOUND(client->getNickname(), channelName));
 		return ;
 	}
 	if (!channel->isMember(client))
 	{
-		client->msgReply(ERR_NOTONCHANNEL(client->getNickname(), channelName));
+		client->msgReply(ERRORWRONGCHANNEL(client->getNickname(), channelName));
 		return ;
 	}
 	if (channel->getLimit() != -1 && channel->getLimit() <= channel->getMembers())
 	{
-		client->msgReply(ERR_CHANNELISFULL(client->getNickname(), channelName));
+		client->msgReply(EERRORFULLCHANNEL(client->getNickname(), channelName));
 		return ;
 	}
 	if (dst->getChannel() != nullp)
 	{
-		client->msgReply(ERR_USERONCHANNEL(client->getNickname(), dst->getNickname(), channelName));
+		client->msgReply(ERRORUSERALREADYIN(client->getNickname(), dst->getNickname(), channelName));
 		return ;
 	}
 	client->invite(dst, channel);

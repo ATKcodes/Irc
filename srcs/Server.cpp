@@ -2,30 +2,26 @@
 
 Server::Server(std::string const &port, std::string const &password)
 {
-	this->host = "127.0.0.1";
 	this->port = port;
 	this->password = password;
-	this->running = 1;
+	this->on = 1;
 	this->sock = this->create_socket();
 	this->handler = new CommandHandler((this));
 }
 
 Server::~Server()
 {
-	std::vector<int> fds;
+	std::vector<int> fdlist;
 
-	// disconnect all clients
-	for (std::map<int, Client *>::iterator it = this->clients.begin(); it != this->clients.end(); ++it)
-		fds.push_back(it->second->getFd());
-	for (int fd = 0; fd != (int)fds.size(); ++fd)
+	for (std::map<int, Client*>::iterator it = this->clients.begin(); it != this->clients.end(); ++it)
+		fdlist.push_back(it->second->getFd());
+	for (std::vector<int>::iterator it = fdlist.begin(); it != fdlist.end(); ++it)
 	{
-		this->clients[fds[fd]]->msgReply("Shutting down the server\n");
-		this->handle_disconnection(fds[fd]);
+		this->clients[*it]->msgReply("Shutting down the server\n");
+		this->quit_server(*it);
 	}
-	// delete all channels
-	for (int channel = 0; channel != (int)this->channels.size(); ++channel)
-		delete this->channels.at(channel);
-	// clean memory
+	for (std::vector<Channel*>::iterator it = this->channels.begin(); it != this->channels.end(); ++it)
+		delete *it;
 	delete this->handler;
 	close(this->sock);
 	print_time("Main Socket Closed");
@@ -45,7 +41,7 @@ void	Server::start()
 
 	signal(SIGINT, handle_sigint);
 	print_time("Server waiting for connections");
-	while (this->running)
+	while (this->on)
 	{
 		if (poll(poll_fds.begin().base(), poll_fds.size(), -1) < 0)
 			throw std::runtime_error("Error while polling");
@@ -69,7 +65,7 @@ void	Server::start()
 			// on disconnect
 			if ((it->revents & POLLHUP) == POLLHUP)
 			{
-				this->handle_disconnection(it->fd);
+				this->quit_server(it->fd);
 				break ;
 			}
 		}
@@ -163,20 +159,20 @@ int Server::handle_input(int fd)
 	
 	if (msg.empty() || msg == "\n")
 	{
-		this->handle_disconnection(fd);
+		this->quit_server(fd);
 		return 1;
 	}
 	
 	Client* client = this->clients.at(fd);
 	if (this->handler->handle_command(client, msg))
 	{
-		this->handle_disconnection(client->getFd());
+		this->quit_server(client->getFd());
 		return 1;
 	}
 	return 0;
 }
 
-void	Server::handle_disconnection(int fd)
+void	Server::quit_server(int fd)
 {
 	try
 	{
@@ -232,7 +228,7 @@ Channel	*Server::createChannel(std::string const &name, std::string const &passw
 	return (channel);
 }
 
-Client	*Server::find_client(std::string const &name)
+Client	*Server::search_client(std::string const &name)
 {
 	std::map<int, Client *>::iterator it;
 

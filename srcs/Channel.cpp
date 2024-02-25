@@ -103,7 +103,7 @@ void	Channel::invite(Client *client, Client *target)
 {
 	if (client->getStatus() != 2)
 	{
-		client->msgReply(ERR_CHANOPRIVSNEEDED(client->getNickname(), this->name));
+		client->msgReply(ERRORNOTADMIN(client->getNickname(), this->name));
 		return ;
 	}
 	target->msgReply(client->getNickname() + " invited " + target->getNickname() + " to channel " + this->name);

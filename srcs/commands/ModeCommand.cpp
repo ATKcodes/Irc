@@ -18,7 +18,7 @@ void ModeCommand::execute(Client *client, std::vector<std::string> args)
 	}
 	if (client->getStatus() != 2)
 	{
-		client->msgReply(ERR_NOTADMIN(client->getNickname()));
+		client->msgReply(ERRORNOTADMIN(client->getNickname(), channel->getName()));
 		return ;
 	}
 	int i;
@@ -44,17 +44,17 @@ void ModeCommand::execute(Client *client, std::vector<std::string> args)
 		}
 		i++;
 		std::string nickname = args[i];
-		Client *target = this->server->find_client(nickname);
+		Client *target = this->server->search_client(nickname);
 		if (target == nullp)
 		{
-			client->msgReply(ERR_NOSUCHNICK(client->getNickname(), nickname));
+			client->msgReply(ERRORNICKNOTFOUND(client->getNickname(), nickname));
 			return ;
 		}
 		if (mode == "+o")
 		{
 			if (!channel->isOperator(client))
 			{
-				client->msgReply(ERR_CHANOPRIVSNEEDED(client->getNickname(), channel->getName()));
+				client->msgReply(ERRORNOTADMIN(client->getNickname(), channel->getName()));
 				return ;
 			}
 			channel->addOperator(target);
@@ -64,7 +64,7 @@ void ModeCommand::execute(Client *client, std::vector<std::string> args)
 		{
 			if (!channel->isOperator(target))
 			{
-				client->msgReply(ERR_CHANOPRIVSNEEDED(client->getNickname(), channel->getName()));
+				client->msgReply(ERRORNOTADMIN(client->getNickname(), channel->getName()));
 				return ;
 			}
 			channel->removeOperator(target);
@@ -141,6 +141,6 @@ void ModeCommand::execute(Client *client, std::vector<std::string> args)
 	}
 	else
 	{
-		client->msgReply(ERR_UNKNOWNMODE(client->getNickname(), mode));
+		client->msgReply(ERRORWRONGMODE(client->getNickname(), mode));
 	}
 }
