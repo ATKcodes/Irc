@@ -30,7 +30,7 @@ void	PrivMsgCommand::execute(Client *client, std::vector<std::string> args)
 		if (channel == nullp)
 			return;
 
-		channel->broadcast(RPL_PRIVMSG(client->getPrefix(), target, msg), client);
+		channel->broadcast(REPLYCMDPRIVMSG(client->getPrefix(), target, msg), client);
 		return;
 	}
 
@@ -41,5 +41,5 @@ void	PrivMsgCommand::execute(Client *client, std::vector<std::string> args)
 		return;
 	}
 
-	dst->reply(RPL_PRIVMSG(client->getPrefix(), target, msg));
+	dst->reply(REPLYCMDPRIVMSG(client->getPrefix(), target, msg));
 }

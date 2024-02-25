@@ -48,7 +48,7 @@ class Client
 		void		setStatus(int status) { this->status = status; }
 		void		setChannel(Channel *channel) { this->channel = channel; }
 
-		std::string	identify();
+		std::string	identify() const;
 		std::string	log(std::string const &log);
 		void		reply(std::string const &msg) const;
 		void		msgReply(std::string const &msg);

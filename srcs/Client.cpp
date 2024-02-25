@@ -1,43 +1,12 @@
 #include "Client.hpp"
 
 Client::Client(int fd, std::string hostname, int port)
+	: fd(fd), hostname(hostname), port(port), status(0), channel(nullp)
 {
-	this->fd = fd;
-	this->hostname = hostname;
-	this->port = port;
-	this->status = 0;
-	this->channel = nullp;
 }
 
-Client::~Client() {}
-
-std::string	Client::identify()
+Client::~Client()
 {
-	std::string	msg;
-	char		tmp[1000];
-
-	sprintf(tmp, "%s:%d", this->getHostname().c_str(), this->getPort());
-	msg.append(tmp);
-	return (msg);
-}
-
-std::string	Client::log(std::string const &log)
-{
-	std::string	msg;
-	char		tmp[1000];
-
-	sprintf(tmp, "%s %s", this->identify().c_str(), log.c_str());
-	msg.append(tmp);
-	return (msg);
-}
-
-void	Client::reply(std::string const &msg) const
-{
-	if (DEBUG)
-		print_time(msg);
-	std::string	tmp = msg + "\r\n";
-	if (send(this->fd, tmp.c_str(), tmp.length(), 0) < 0)
-		throw std::runtime_error("Error while sending");
 }
 
 void	Client::msgReply(std::string const &msg)
@@ -51,8 +20,34 @@ void	Client::welcome()
 {
 	if (!this->status || this->username.empty() || this->realname.empty() || this->nickname.empty())
 		return ;
-	this->msgReply(RPL_WELCOME(this->nickname));
+	this->msgReply(REPLYMEET(this->nickname));
 	print_time(this->log("is known as " + this->nickname));
+}
+
+std::string	Client::identify() const
+{
+	std::stringstream ss;
+	ss << this->getHostname() << ":" << this->getPort();
+	return ss.str();
+}
+
+void	Client::reply(std::string const &msg) const
+{
+	if (DEBUG)
+		print_time(msg);
+	std::string	tmp = msg + "\r\n";
+	if (send(this->fd, tmp.c_str(), tmp.length(), 0) < 0)
+		throw std::runtime_error("Error while sending");
+}
+
+std::string	Client::log(std::string const &log)
+{
+	std::string	msg;
+	char		tmp[1000];
+
+	sprintf(tmp, "%s %s", this->identify().c_str(), log.c_str());
+	msg.append(tmp);
+	return (msg);
 }
 
 void	Client::join(Channel *channel)
@@ -66,10 +61,10 @@ void	Client::join(Channel *channel)
 	for (std::vector<std::string>::iterator it = users.begin(); it != users.end(); ++it)
 		users_string.append((*it)).append(" ");
 	
-	this->msgReply(RPL_NAMREPLY(this->nickname, channel->getName(), users_string));
-	this->msgReply(RPL_ENDOFNAMES(this->nickname, channel->getName()));
+	this->msgReply(REPLYNAMEDMESSAGE(this->nickname, channel->getName(), users_string));
+	this->msgReply(REPLYLASTNAME(this->nickname, channel->getName()));
 	
-	channel->broadcast(RPL_JOIN(this->getPrefix(), channel->getName()));
+	channel->broadcast(REPLYCMDJOIN(this->getPrefix(), channel->getName()));
 	print_time(this->nickname + " has joined channel " + channel->getName());
 }
 
@@ -77,9 +72,9 @@ void	Client::leave()
 {
 	if (this->channel == nullp)
 		return ;
-	this->channel->broadcast(RPL_PART(this->getPrefix(), this->channel->getName()));
+	this->channel->broadcast(REPLYCMDPART(this->getPrefix(), this->channel->getName()));
 	print_time(this->nickname + " has left channel " + channel->getName());
-	this->channel->removeClient((this));
+	this->channel->deleteclient((this));
 }
 
 std::string	Client::getPrefix() const
@@ -96,7 +91,7 @@ std::string	Client::getPrefix() const
 
 void	Client::invite(Client *client, Channel *channel)
 {
-	this->msgReply(RPL_INVITING(client->getNickname(), this->nickname, channel->getName()));
+	this->msgReply(REPLYINVITING(client->getNickname(), this->nickname, channel->getName()));
 	channel->invite(this, client);
 }
 

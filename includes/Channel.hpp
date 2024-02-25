@@ -30,7 +30,7 @@ class Channel
 		std::vector<std::string>	getNicknames();
 		void						broadcast(std::string const &msg, Client *except = nullp);
 		void						addClient(Client *client);
-		void						removeClient(Client *client);
+		void						deleteclient(Client *client);
 		void						kick(Client *client, Client *target, std::string const &reason);
 		void						invite(Client *client, Client *target);
 		int							isMember(Client *client); // 0 = not member, 1 = member

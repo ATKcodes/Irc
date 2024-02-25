@@ -60,7 +60,7 @@ void	Channel::addClient(Client *client)
 		client->setStatus(2);
 }
 
-void	Channel::removeClient(Client *client)
+void	Channel::deleteclient(Client *client)
 {
 	std::vector<Client *>::iterator	it;
 	std::string						msg;
@@ -92,8 +92,8 @@ void	Channel::kick(Client *client, Client *target, std::string const &reason)
 {
 	std::string	tmp;
 
-	this->broadcast(RPL_KICK(client->getPrefix(), this->name, target->getNickname(), reason));
-	this->removeClient(target);
+	this->broadcast(REPLYCMDKICK(client->getPrefix(), this->name, target->getNickname(), reason));
+	this->deleteclient(target);
 
 	tmp = client->getNickname() + " kicked " + target->getNickname() + " form channel " + this->name;
 	print_time(tmp);

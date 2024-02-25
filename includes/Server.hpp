@@ -13,6 +13,8 @@
 #include <poll.h>
 #include <vector>
 #include <cerrno>
+#include <sstream>
+
 
 class Server;
 
