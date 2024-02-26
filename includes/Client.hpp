@@ -51,7 +51,7 @@ class Client
 		std::string	identify() const;
 		std::string	log(std::string const &log);
 		void		reply(std::string const &msg) const;
-		void		msgReply(std::string const &msg);
+		void		send_msg(std::string const &msg);
 		void		welcome();
 		void		join(Channel *channel);
 		void		leave();

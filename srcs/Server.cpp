@@ -5,7 +5,7 @@ Server::Server(std::string const &port, std::string const &password)
 	this->port = port;
 	this->password = password;
 	this->on = 1;
-	this->sock = this->create_socket();
+	this->sock = this->socket_init();
 	this->handler = new CommandHandler((this));
 }
 
@@ -17,14 +17,13 @@ Server::~Server()
 		fdlist.push_back(it->second->getFd());
 	for (std::vector<int>::iterator it = fdlist.begin(); it != fdlist.end(); ++it)
 	{
-		this->clients[*it]->msgReply("Shutting down the server\n");
+		this->clients[*it]->send_msg("Closing the server\n");
 		this->quit_server(*it);
 	}
 	for (std::vector<Channel*>::iterator it = this->channels.begin(); it != this->channels.end(); ++it)
 		delete *it;
 	delete this->handler;
 	close(this->sock);
-	print_time("Main Socket Closed");
 }
 
 void	handle_sigint(int sig)
@@ -34,7 +33,7 @@ void	handle_sigint(int sig)
 	throw ServerQuitException();
 }
 
-void	Server::start()
+void	Server::init()
 {
 	pollfd	server_fd = {this->sock, POLLIN, 0};
 	poll_fds.push_back(server_fd);
@@ -72,55 +71,50 @@ void	Server::start()
 	}
 }
 
-int	Server::create_socket()
+int	Server::socket_init()
 {
-	int	sockfd;
-	int	int_port;
+	int	server_socket;
+	int	port_struct;
 
-	// open the socket
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockfd < 0)
-		throw std::runtime_error("Error while opening socket");
-	// set to non-blocking mode
-	if (fcntl(sockfd, F_SETFL, O_NONBLOCK) == -1)
-		throw std::runtime_error("Error while setting socket to NON-BLOCKING");
-	// setup the binding informations
+	server_socket = socket(AF_INET, SOCK_STREAM, 0);
+	if (server_socket < 0)
+		throw std::runtime_error("Error socket : open");
+	if (fcntl(server_socket, F_SETFL, O_NONBLOCK) == -1)
+		throw std::runtime_error("Error socket : NON-BLOCKING");
 	struct sockaddr_in addr = {};
 	bzero((char *)&addr, sizeof(addr));
-	std::istringstream(this->port) >> int_port;
+	std::istringstream(this->port) >> port_struct;
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = INADDR_ANY;
-	addr.sin_port = htons(int_port);
-	// bind the socket
-	if (bind(sockfd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
-		throw std::runtime_error("Error while binding socket");
-	// listen on the socket
-	if (listen(sockfd, MAX_CONNECTIONS) < 0)
-		throw std::runtime_error("Error while listening in socket");
-	return (sockfd);
+	addr.sin_port = htons(port_struct);
+	if (bind(server_socket, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+		throw std::runtime_error("Error socket : bind");
+	if (listen(server_socket, MAX_CONNECTIONS) < 0)
+		throw std::runtime_error("Error socket : listen");
+	return (server_socket);
 }
 
 void	Server::add_client()
 {
-	int			fd;
 	sockaddr_in	addr = {};
+	int			fd;
+	std::string	ip;
 	socklen_t 	size;
-	std::string	ip_addr;
 
 	// accept connection
 	size = sizeof(addr);
 	fd = accept(this->sock, (sockaddr *)&addr, &size);
 	if (fd < 0)
-		throw std::runtime_error("Error while accepting new client");
+		throw std::runtime_error("New Client Error");
 	// save th client's fd
 	pollfd	poll_fd = {fd, POLLIN, 0};
 	this->poll_fds.push_back(poll_fd);
 	// get client info
-	ip_addr = inet_ntoa(addr.sin_addr);
+	ip = inet_ntoa(addr.sin_addr);
 	if (getsockname(fd, (struct sockaddr *)&addr, &size) != 0)
-		throw std::runtime_error("Error while gathering client informations");
+		throw std::runtime_error("New Client Error");
 	// create a new client
-	Client *new_client = new Client(fd, ip_addr, ntohs(addr.sin_port));
+	Client *new_client = new Client(fd, ip, ntohs(addr.sin_port));
 	this->clients.insert(std::make_pair(fd, new_client));
 	// log new connection
 	print_time(new_client->log("has connected"));
@@ -164,7 +158,7 @@ int Server::handle_input(int fd)
 	}
 	
 	Client* client = this->clients.at(fd);
-	if (this->handler->handle_command(client, msg))
+	if (this->handler->manage_cmds(client, msg))
 	{
 		this->quit_server(client->getFd());
 		return 1;

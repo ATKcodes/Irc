@@ -34,16 +34,16 @@ bool	Channel::isTopicOnly() const
 
 std::vector<std::string>	Channel::getNicknames()
 {
-	std::vector<std::string>	nicknames;
+	std::vector<std::string>	nick_list;
 
 	for (std::vector<Client *>::iterator it = this->clients.begin(); it != this->clients.end(); ++it)
 	{
-		nicknames.push_back((*it)->getNickname());
+		nick_list.push_back((*it)->getNickname());
 	}
-	return (nicknames);
+	return (nick_list);
 }
 
-void	Channel::broadcast(std::string const &msg, Client *except)
+void	Channel::send_all(std::string const &msg, Client *except)
 {
 	for (std::vector<Client *>::iterator it = this->clients.begin(); it != this->clients.end(); ++it)
 	{
@@ -65,7 +65,6 @@ void	Channel::deleteclient(Client *client)
 	std::vector<Client *>::iterator	it;
 	std::string						msg;
 
-	// remove the client
 	for (it = this->clients.begin(); it != this->clients.end(); ++it)
 	{
 		if ((*it) == client)
@@ -75,7 +74,6 @@ void	Channel::deleteclient(Client *client)
 		}
 	}
 	client->setChannel(nullp);
-	// set status
 	if (client->getStatus() == 2)
 	{
 		client->setStatus(1);
@@ -92,10 +90,10 @@ void	Channel::kick(Client *client, Client *target, std::string const &reason)
 {
 	std::string	tmp;
 
-	this->broadcast(REPLYCMDKICK(client->getPrefix(), this->name, target->getNickname(), reason));
+	this->send_all(REPLYCMDKICK(client->getPrefix(), this->name, target->getNickname(), reason));
 	this->deleteclient(target);
 
-	tmp = client->getNickname() + " kicked " + target->getNickname() + " form channel " + this->name;
+	tmp = client->getNickname() + " has kicked " + target->getNickname() + " from the channel " + this->name;
 	print_time(tmp);
 }
 
@@ -103,10 +101,10 @@ void	Channel::invite(Client *client, Client *target)
 {
 	if (client->getStatus() != 2)
 	{
-		client->msgReply(ERRORNOTADMIN(client->getNickname(), this->name));
+		client->send_msg(ERRORNOTADMIN(client->getNickname(), this->name));
 		return ;
 	}
-	target->msgReply(client->getNickname() + " invited " + target->getNickname() + " to channel " + this->name);
+	target->send_msg(client->getNickname() + " invited " + target->getNickname() + " to channel " + this->name);
 	target->join(this);
 }
 

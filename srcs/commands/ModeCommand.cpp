@@ -3,22 +3,22 @@
 ModeCommand::ModeCommand(Server *server, int auth) : Command(server, auth) {}
 ModeCommand::~ModeCommand() {}
 
-void ModeCommand::execute(Client *client, std::vector<std::string> args)
+void ModeCommand::exec(Client *client, std::vector<std::string> args)
 {
 	Channel	*channel = client->getChannel();
 	if (channel == nullp)
 	{
-		client->msgReply(client->getNickname() + " :You're not on a channel");
+		client->send_msg(client->getNickname() + " :You're not on a channel");
 		return ;
 	}
 	if (args.empty())
 	{
-		client->msgReply("MODE " + channel->getName() + " " + channel->getMode());
+		client->send_msg("MODE " + channel->getName() + " " + channel->getMode());
 		return ;
 	}
 	if (client->getStatus() != 2)
 	{
-		client->msgReply(ERRORNOTADMIN(client->getNickname(), channel->getName()));
+		client->send_msg(ERRORNOTADMIN(client->getNickname(), channel->getName()));
 		return ;
 	}
 	int i;
@@ -39,7 +39,7 @@ void ModeCommand::execute(Client *client, std::vector<std::string> args)
 	{
 		if (args.size() < (2 + (unsigned int)i))
 		{
-			client->msgReply("MODE " + channel->getName() + " " + channel->getMode());
+			client->send_msg("MODE " + channel->getName() + " " + channel->getMode());
 			return ;
 		}
 		i++;
@@ -47,14 +47,14 @@ void ModeCommand::execute(Client *client, std::vector<std::string> args)
 		Client *target = this->server->search_client(nickname);
 		if (target == nullp)
 		{
-			client->msgReply(ERRORNICKNOTFOUND(client->getNickname(), nickname));
+			client->send_msg(ERRORNICKNOTFOUND(client->getNickname(), nickname));
 			return ;
 		}
 		if (mode == "+o")
 		{
 			if (!channel->isOperator(client))
 			{
-				client->msgReply(ERRORNOTADMIN(client->getNickname(), channel->getName()));
+				client->send_msg(ERRORNOTADMIN(client->getNickname(), channel->getName()));
 				return ;
 			}
 			channel->addOperator(target);
@@ -64,7 +64,7 @@ void ModeCommand::execute(Client *client, std::vector<std::string> args)
 		{
 			if (!channel->isOperator(target))
 			{
-				client->msgReply(ERRORNOTADMIN(client->getNickname(), channel->getName()));
+				client->send_msg(ERRORNOTADMIN(client->getNickname(), channel->getName()));
 				return ;
 			}
 			channel->removeOperator(target);
@@ -77,7 +77,7 @@ void ModeCommand::execute(Client *client, std::vector<std::string> args)
 		{
 			if (args.size() < (2 + (unsigned int)i))
 			{
-				client->msgReply("MODE " + channel->getName() + " " + channel->getMode());
+				client->send_msg("MODE " + channel->getName() + " " + channel->getMode());
 				return ;
 			}
 			int limit;
@@ -100,7 +100,7 @@ void ModeCommand::execute(Client *client, std::vector<std::string> args)
 		{
 			if (args.size() < (2 + (unsigned int)i))
 			{
-				client->msgReply("MODE " + channel->getName() + " " + channel->getMode());
+				client->send_msg("MODE " + channel->getName() + " " + channel->getMode());
 				return ;
 			}
 			std::string key = args[(1 + i)];
@@ -141,6 +141,6 @@ void ModeCommand::execute(Client *client, std::vector<std::string> args)
 	}
 	else
 	{
-		client->msgReply(ERRORWRONGMODE(client->getNickname(), mode));
+		client->send_msg(ERRORWRONGMODE(client->getNickname(), mode));
 	}
 }

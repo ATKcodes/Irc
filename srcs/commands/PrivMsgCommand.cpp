@@ -4,15 +4,14 @@ PrivMsgCommand::PrivMsgCommand(Server *server, int auth) : Command(server, auth)
 
 PrivMsgCommand::~PrivMsgCommand() {}
 
-void	PrivMsgCommand::execute(Client *client, std::vector<std::string> args)
+void	PrivMsgCommand::exec(Client *client, std::vector<std::string> args)
 {
 	if (args.size() < 2 || args.at(0).empty() || args.at(1).empty())
 	{
-		client->msgReply(ERRORPARAMS(client->getNickname(), "PRIVMSG"));
+		client->send_msg(ERRORPARAMS(client->getNickname(), "PRIVMSG"));
 		return;
 	}
 
-	std::string	target = args.at(0);
 	std::string	msg;
 
 	for (std::vector<std::string>::iterator it = args.begin() + 1; it != args.end(); ++it)
@@ -23,23 +22,23 @@ void	PrivMsgCommand::execute(Client *client, std::vector<std::string> args)
 	if (msg.at(0) == ':')
 		msg = msg.substr(1);
 
-	if (target.at(0) == '#')
+	if (args.at(0).at(0) == '#')
 	{
 
 		Channel	*channel = client->getChannel();
 		if (channel == nullp)
 			return;
 
-		channel->broadcast(REPLYCMDPRIVMSG(client->getPrefix(), target, msg), client);
+		channel->send_all(REPLYCMDPRIVMSG(client->getPrefix(), args.at(0), msg), client);
 		return;
 	}
 
-	Client	*dst = this->server->getClient(target);
+	Client	*dst = this->server->getClient(args.at(0));
 	if (dst == nullp)
 	{
-		client->msgReply(ERRORNICKNOTFOUND(client->getNickname(), target));
+		client->send_msg(ERRORNICKNOTFOUND(client->getNickname(), args.at(0)));
 		return;
 	}
 
-	dst->reply(REPLYCMDPRIVMSG(client->getPrefix(), target, msg));
+	dst->reply(REPLYCMDPRIVMSG(client->getPrefix(), args.at(0), msg));
 }

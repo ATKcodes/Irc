@@ -20,7 +20,7 @@ class CommandHandler
 		CommandHandler(Server *server);
 		~CommandHandler();
 
-		int		handle_command(Client *client, std::string cmd);
+		int		manage_cmds(Client *client, std::string cmd);
 
 };
 

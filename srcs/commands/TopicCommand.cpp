@@ -4,18 +4,18 @@ TopicCommand::TopicCommand(Server *server, int auth) : Command(server, auth) {}
 
 TopicCommand::~TopicCommand() {}
 
-void TopicCommand::execute(Client *client, std::vector<std::string> args)
+void TopicCommand::exec(Client *client, std::vector<std::string> args)
 {
 	Channel	*channel = client->getChannel();
 	if (channel == nullp)
 	{
-		client->msgReply(client->getNickname() + " :You're not on a channel");
+		client->send_msg(client->getNickname() + " :You're not on a channel");
 		return ;
 	}
 	std::string old_topic = channel->getTopic();
 	if (args.empty() || (args[0] == channel->getName() && args.size() == 1)) //dumb fixes for hexchat
 	{
-		client->msgReply("Topic for " + channel->getName() + " is : " + channel->getTopic());
+		client->send_msg("Topic for " + channel->getName() + " is : " + channel->getTopic());
 		return ;
 	}
 
@@ -25,7 +25,7 @@ void TopicCommand::execute(Client *client, std::vector<std::string> args)
 	}
 	else if (client->getStatus() != 2)
 	{
-		client->msgReply(ERRORNOTADMIN(client->getNickname(), channel->getName()));
+		client->send_msg(ERRORNOTADMIN(client->getNickname(), channel->getName()));
 		return ;
 	}
 	std::string topic;

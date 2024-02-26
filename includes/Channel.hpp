@@ -28,7 +28,7 @@ class Channel
 		std::string					getPassword() const { return (this->password); }
 
 		std::vector<std::string>	getNicknames();
-		void						broadcast(std::string const &msg, Client *except = nullp);
+		void						send_all(std::string const &msg, Client *except = nullp);
 		void						addClient(Client *client);
 		void						deleteclient(Client *client);
 		void						kick(Client *client, Client *target, std::string const &reason);

@@ -50,10 +50,10 @@ class Server
 
 		std::string				getPassword() { return (this->password); }
 		void					add_client();
-		int						create_socket();
+		int						socket_init();
 		int						handle_input(int fd);
 		std::string				receive(int fd);
-		void					start();
+		void					init();
 		Channel					*createChannel(std::string const &name, std::string const &password);
 		Channel					*getChannel(std::string const &name);
 		void					quit_server(int fd);

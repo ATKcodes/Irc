@@ -20,7 +20,7 @@ class Command
 		virtual ~Command() {}
 
 		int				getAuth() const { return (this->auth); }
-		virtual void	execute(Client *client, std::vector<std::string> args) = 0;
+		virtual void	exec(Client *client, std::vector<std::string> args) = 0;
 	 
 };
 
@@ -30,7 +30,7 @@ class ModeCommand : public Command
 		ModeCommand(Server *server, int auth = 1);
 		~ModeCommand();
 
-		void execute(Client *client, std::vector<std::string> args);
+		void exec(Client *client, std::vector<std::string> args);
 };
 
 class TopicCommand : public Command
@@ -39,7 +39,7 @@ class TopicCommand : public Command
 		TopicCommand(Server *server, int auth = 0);
 		~TopicCommand();
 
-		void execute(Client *client, std::vector<std::string> args);
+		void exec(Client *client, std::vector<std::string> args);
 };
 
 class InviteCommand : public Command
@@ -48,7 +48,7 @@ class InviteCommand : public Command
 		InviteCommand(Server *server, int auth = 0);
 		~InviteCommand();
 
-		void execute(Client *client, std::vector<std::string> args);
+		void exec(Client *client, std::vector<std::string> args);
 };
 
 class PrivMsgCommand : public Command
@@ -57,7 +57,7 @@ class PrivMsgCommand : public Command
 		PrivMsgCommand(Server *server, int auth = 0);
 		~PrivMsgCommand();
 
-		void execute(Client *client, std::vector<std::string> args);
+		void exec(Client *client, std::vector<std::string> args);
 };
 
 class PartCommand : public Command
@@ -66,7 +66,7 @@ class PartCommand : public Command
 		PartCommand(Server *server, int auth = 0);
 		~PartCommand();
 
-		void execute(Client *client, std::vector<std::string> args);
+		void exec(Client *client, std::vector<std::string> args);
 };
 
 class QuitCommand : public Command
@@ -75,7 +75,7 @@ class QuitCommand : public Command
 		QuitCommand(Server *server, int auth = 0);
 		~QuitCommand();
 
-		void execute(Client *client, std::vector<std::string> args);
+		void exec(Client *client, std::vector<std::string> args);
 };
 
 class JoinCommand : public Command
@@ -84,7 +84,7 @@ class JoinCommand : public Command
 		JoinCommand(Server *server, int auth = 0);
 		~JoinCommand();
 
-		void execute(Client *client, std::vector<std::string> args);
+		void exec(Client *client, std::vector<std::string> args);
 };
 
 class UserCommand : public Command
@@ -93,7 +93,7 @@ class UserCommand : public Command
 		UserCommand(Server *server, int auth = 0);
 		~UserCommand();
 
-		void execute(Client *client, std::vector<std::string> args);
+		void exec(Client *client, std::vector<std::string> args);
 };
 
 class NickCommand : public Command
@@ -102,7 +102,7 @@ class NickCommand : public Command
 		NickCommand(Server *server, int auth = 0);
 		~NickCommand();
 
-		void execute(Client *client, std::vector<std::string> args);
+		void exec(Client *client, std::vector<std::string> args);
 };
 
 
@@ -112,7 +112,7 @@ class PassCommand : public Command
 		PassCommand(Server *server, int auth = 0);
 		~PassCommand();
 
-		void execute(Client *client, std::vector<std::string> args);
+		void exec(Client *client, std::vector<std::string> args);
 };
 
 class KickCommand : public Command
@@ -121,7 +121,7 @@ class KickCommand : public Command
 		KickCommand(Server *server, int auth = 1);
 		~KickCommand();
 
-		void execute(Client *client, std::vector<std::string> args);
+		void exec(Client *client, std::vector<std::string> args);
 };
 
 

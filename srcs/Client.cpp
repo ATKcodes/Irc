@@ -9,19 +9,39 @@ Client::~Client()
 {
 }
 
-void	Client::msgReply(std::string const &msg)
-{
-	if (DEBUG)
-		print_time(msg);
-	this->reply(":" + this->getPrefix() + " " + msg);
-}
-
 void	Client::welcome()
 {
 	if (!this->status || this->username.empty() || this->realname.empty() || this->nickname.empty())
 		return ;
-	this->msgReply(REPLYMEET(this->nickname));
+	this->send_msg(REPLYMEET(this->nickname));
 	print_time(this->log("is known as " + this->nickname));
+}
+
+void	Client::join(Channel *channel)
+{
+	std::string					nick;
+	std::vector<std::string>	users;
+
+	channel->addClient((this));
+	this->channel = channel;
+	users = channel->getNicknames();
+	for (std::vector<std::string>::iterator it = users.begin(); it != users.end(); ++it)
+		nick.append((*it)).append(" ");
+	
+	this->send_msg(REPLYNAMEDMESSAGE(this->nickname, channel->getName(), nick));
+	this->send_msg(REPLYLASTNAME(this->nickname, channel->getName()));
+	
+	channel->send_all(REPLYCMDJOIN(this->getPrefix(), channel->getName()));
+	print_time(this->nickname + " has joined channel " + channel->getName());
+}
+
+void	Client::leave()
+{
+	if (this->channel == nullp)
+		return ;
+	this->channel->send_all(REPLYCMDPART(this->getPrefix(), this->channel->getName()));
+	print_time(this->nickname + " has left channel " + channel->getName());
+	this->channel->deleteclient((this));
 }
 
 std::string	Client::identify() const
@@ -31,6 +51,12 @@ std::string	Client::identify() const
 	return ss.str();
 }
 
+void	Client::invite(Client *client, Channel *channel)
+{
+	this->send_msg(REPLYINVITING(client->getNickname(), this->nickname, channel->getName()));
+	channel->invite(this, client);
+}
+
 void	Client::reply(std::string const &msg) const
 {
 	if (DEBUG)
@@ -38,6 +64,25 @@ void	Client::reply(std::string const &msg) const
 	std::string	tmp = msg + "\r\n";
 	if (send(this->fd, tmp.c_str(), tmp.length(), 0) < 0)
 		throw std::runtime_error("Error while sending");
+}
+
+void Client::msgChannel(Channel *channel, std::string const &msg)
+{
+	std::vector<Client *>	clients = channel->getClients();
+
+	for (std::vector<Client *>::iterator it = clients.begin(); it != clients.end(); ++it)
+	{
+		if ((*it) == this)
+			continue ;
+		(*it)->send_msg(msg);
+	}
+}
+
+void	Client::send_msg(std::string const &msg)
+{
+	if (DEBUG)
+		print_time(msg);
+	this->reply(":" + this->getPrefix() + " " + msg);
 }
 
 std::string	Client::log(std::string const &log)
@@ -50,33 +95,6 @@ std::string	Client::log(std::string const &log)
 	return (msg);
 }
 
-void	Client::join(Channel *channel)
-{
-	std::string					users_string;
-	std::vector<std::string>	users;
-
-	channel->addClient((this));
-	this->channel = channel;
-	users = channel->getNicknames();
-	for (std::vector<std::string>::iterator it = users.begin(); it != users.end(); ++it)
-		users_string.append((*it)).append(" ");
-	
-	this->msgReply(REPLYNAMEDMESSAGE(this->nickname, channel->getName(), users_string));
-	this->msgReply(REPLYLASTNAME(this->nickname, channel->getName()));
-	
-	channel->broadcast(REPLYCMDJOIN(this->getPrefix(), channel->getName()));
-	print_time(this->nickname + " has joined channel " + channel->getName());
-}
-
-void	Client::leave()
-{
-	if (this->channel == nullp)
-		return ;
-	this->channel->broadcast(REPLYCMDPART(this->getPrefix(), this->channel->getName()));
-	print_time(this->nickname + " has left channel " + channel->getName());
-	this->channel->deleteclient((this));
-}
-
 std::string	Client::getPrefix() const
 {
 	std::string	tmp;
@@ -87,22 +105,4 @@ std::string	Client::getPrefix() const
 	if (!this->hostname.empty())
 		tmp.append("@").append(this->hostname);
 	return (tmp);
-}
-
-void	Client::invite(Client *client, Channel *channel)
-{
-	this->msgReply(REPLYINVITING(client->getNickname(), this->nickname, channel->getName()));
-	channel->invite(this, client);
-}
-
-void Client::msgChannel(Channel *channel, std::string const &msg)
-{
-	std::vector<Client *>	clients = channel->getClients();
-
-	for (std::vector<Client *>::iterator it = clients.begin(); it != clients.end(); ++it)
-	{
-		if ((*it) == this)
-			continue ;
-		(*it)->msgReply(msg);
-	}
 }

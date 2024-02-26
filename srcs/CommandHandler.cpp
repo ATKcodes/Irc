@@ -7,7 +7,6 @@ CommandHandler::CommandHandler(Server *server)
 	this->commands["PASS"] = new PassCommand(server, 0);
 	this->commands["NICK"] = new NickCommand(server, 0);
 	this->commands["USER"] = new UserCommand(server, 0);
-	this->commands["QUIT"] = new QuitCommand(server, 0);
 	
 	this->commands["JOIN"] = new JoinCommand(server, 1);
 	this->commands["PART"] = new PartCommand(server, 1);
@@ -27,51 +26,47 @@ CommandHandler::~CommandHandler()
 		delete it->second;
 }
 
-int	CommandHandler::handle_command(Client *client, std::string cmd)
+int	CommandHandler::manage_cmds(Client *client, std::string cmd)
 {
 	std::stringstream	ss_cmd(cmd);
 	std::string			parsed;
-	int					length;
-	std::string			name;
+	int					size;
+	std::string			cmd_name;
 
 	while (std::getline(ss_cmd, parsed))
 	{
 		std::string	msg;
-		length = parsed.length();
+		size = parsed.length();
 		if (parsed[parsed.length() - 1] == '\n')
-			length -= 1; 
-		parsed = parsed.substr(0, length);
-		name = parsed.substr(0, parsed.find(' '));
+			size -= 1; 
+		parsed = parsed.substr(0, size);
+		cmd_name = parsed.substr(0, parsed.find(' '));
 		try
 		{
-			Command						*command = this->commands.at(name);
+			Command						*command = this->commands.at(cmd_name);
 			std::vector<std::string>	args;
-			std::stringstream			ss_args(parsed.substr(name.length(), parsed.length()));
+			std::stringstream			ss_args(parsed.substr(cmd_name.length(), parsed.length()));
 			std::string					arg;
 
 			// if he has no authorization
-			if (client->getStatus() < command->getAuth()) // auth check
+			if (client->getStatus() < command->getAuth())
 			{
 				if (!client->getStatus())
-					client->msgReply(ERRORNOTREGISTERED(client->getNickname()));
+					client->send_msg(ERRORNOTREGISTERED(client->getNickname()));
 				else
-					client->msgReply(ERRORNOTADMIN(client->getNickname(), client->getChannel()->getName()));
+					client->send_msg(ERRORNOTADMIN(client->getNickname(), client->getChannel()->getName()));
 				return (0);
 			}
-			// get the args
 			while (ss_args >> arg)
 				args.push_back(arg);
-			// execute the command
-			command->execute(client, args);
+			// exec the command
+			command->exec(client, args);
 		}
 		catch (const std::out_of_range &err)
 		{
 
-			client->msgReply(ERRORCOMMAND(client->getNickname(), name));
+			client->send_msg(ERRORCOMMAND(client->getNickname(), cmd_name));
 		}
-
-		if (!name.compare("QUIT"))
-			return (1);
 	}
 	return (0);
 }

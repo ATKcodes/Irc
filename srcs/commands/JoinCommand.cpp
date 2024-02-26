@@ -4,42 +4,40 @@ JoinCommand::JoinCommand(Server *server, int auth) : Command(server, auth) {}
 
 JoinCommand::~JoinCommand() {}
 
-void	JoinCommand::execute(Client *client, std::vector<std::string> args)
+void	JoinCommand::exec(Client *client, std::vector<std::string> args)
 {
 	if (args.empty())
 	{
-		client->msgReply(ERRORPARAMS(client->getNickname(), "PASS"));
+		client->send_msg(ERRORPARAMS(client->getNickname(), "JOIN"));
 		return ;
 	}
-	std::string	name = args.at(0);
 	std::string	password = "";
 	if (args.size() > 1)
 		password = args.at(1);
-
 	Channel	*channel = client->getChannel();
 	if (channel != nullp)
 	{
-		client->msgReply(ERRORTOOMANYCHANNELS(client->getNickname(), name));
+		client->send_msg(ERRORTOOMANYCHANNELS(client->getNickname(), args.at(0)));
 		return ;
 	}
 
-	channel = this->server->getChannel(name);
+	channel = this->server->getChannel(args.at(0));
 	if (channel == nullp)
-		channel = this->server->createChannel(name, password);
+		channel = this->server->createChannel(args.at(0), password);
 
 	if (password.compare(channel->getPassword()))
 	{
-		client->msgReply(ERRORWRONGPASSCHANNEL(client->getNickname(), name));
+		client->send_msg(ERRORWRONGPASSCHANNEL(client->getNickname(), args.at(0)));
 		return ;
 	}
 	if(channel->getLimit() != -1 && channel->getLimit() <= channel->getMembers())
 	{
-		client->msgReply(EERRORFULLCHANNEL(client->getNickname(), name));
+		client->send_msg(EERRORFULLCHANNEL(client->getNickname(), args.at(0)));
 		return ;
 	}
 	if(channel->isInviteOnly())
 	{
-		client->msgReply(ERRORINVITEONLY(client->getNickname(), name));
+		client->send_msg(ERRORINVITEONLY(client->getNickname(), args.at(0)));
 		return ;
 	}
 	client->join(channel);

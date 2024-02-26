@@ -4,16 +4,14 @@ KickCommand::KickCommand(Server *server, int auth) : Command(server, auth) {}
 
 KickCommand::~KickCommand() {}
 
-void	KickCommand::execute(Client *client, std::vector<std::string> args)
+void	KickCommand::exec(Client *client, std::vector<std::string> args)
 {
 	if ((int)args.size() < 2)
 	{
-		client->msgReply(ERRORPARAMS(client->getNickname(), "KICK"));
+		client->send_msg(ERRORPARAMS(client->getNickname(), "KICK"));
 		return ;
 	}
-
-	std::string	name = args.at(0);
-	std::string	target = args.at(1);
+	
 	std::string	reason = "No reason specified";
 
 	if (args.size() >= 3 && (args[2][0] != ':' || args[2].size() > 1))
@@ -24,22 +22,22 @@ void	KickCommand::execute(Client *client, std::vector<std::string> args)
 	}
 
 	Channel	*channel = client->getChannel();
-	if (channel == nullp || channel->getName() != name)
+	if (channel == nullp || channel->getName() != args.at(0))
 	{
-		client->msgReply(ERRORWRONGCHANNEL(client->getNickname(), name));
+		client->send_msg(ERRORWRONGCHANNEL(client->getNickname(), args.at(0)));
 		return ;
 	}
 
-	Client	*dst = this->server->getClient(target);
+	Client	*dst = this->server->getClient(args.at(1));
 	if (dst == nullp)
 	{
-		client->msgReply(ERRORNICKNOTFOUND(client->getNickname(), target));
+		client->send_msg(ERRORNICKNOTFOUND(client->getNickname(), args.at(1)));
 		return;
 	}
 
 	if (dst->getChannel() == nullp || dst->getChannel() != channel)
 	{
-		client->msgReply(ERRORKICKNOTFOUND(client->getNickname(), dst->getNickname(), name));
+		client->send_msg(ERRORKICKNOTFOUND(client->getNickname(), dst->getNickname(), args.at(0)));
 		return;
 	}
 

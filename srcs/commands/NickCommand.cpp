@@ -4,21 +4,18 @@ NickCommand::NickCommand(Server *server, int auth) : Command(server, auth) {}
 
 NickCommand::~NickCommand() {}
 
-void NickCommand::execute(Client *client, std::vector<std::string> args)
+void NickCommand::exec(Client *client, std::vector<std::string> args)
 {
 	if (args.empty() || args.at(0).empty())
 	{
-		client->msgReply(ERRORBLANKNICK(client->getNickname()));
+		client->send_msg(ERRORBLANKNICK(client->getNickname()));
 		return;
 	}
-
-	std::string	nickname = args.at(0);
-
-	if (this->server->getClient(nickname))
+	if (this->server->getClient(args.at(0)))
 	{
-		client->msgReply(ERRORDOUBLENICK(client->getNickname()));
+		client->send_msg(ERRORDOUBLENICK(client->getNickname()));
 		return;
 	}
-	client->setNickname(nickname);
+	client->setNickname(args.at(0));
 	client->welcome();
 }
