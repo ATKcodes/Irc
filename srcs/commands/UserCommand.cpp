@@ -6,7 +6,7 @@ UserCommand::~UserCommand() {}
 
 void UserCommand::exec(Client *client, std::vector<std::string> args)
 {
-	if (args.size() != 4)
+	if (args.size() < 4)
 	{
 		client->send_msg(client->getNickname() + " USER" + " : Usage: USER <username> <realname>\r\n");
 		return;

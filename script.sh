@@ -1,12 +1,12 @@
 
 (
     echo "PASS p"
-    echo "NICK troia"
-    echo "USER dio merda infame"
+    echo "NICK ao"
+    echo "USER lazio inter rome"
     for i in {1..20}
     do
-        echo "JOIN l"
-        echo "PART l"
+        echo "JOIN bella"
+        echo "PART bella"
 		sleep 0.01
     done
-) | nc 127.0.0.1 6668
+) | nc 127.0.0.1 6667

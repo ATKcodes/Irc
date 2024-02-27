@@ -12,6 +12,7 @@ void	JoinCommand::exec(Client *client, std::vector<std::string> args)
 		return ;
 	}
 	std::string	password = "";
+	std::string	name = args.at(0);
 	if (args.size() > 1)
 		password = args.at(1);
 	Channel	*channel = client->getChannel();
